@@ -20,19 +20,28 @@ server.listen(3000 , () => {
 
 
 // Socket
-
-// On Connection
-
-var clients = []
 io.on('connection' , (socket) => {
     console.log(`Socket conectado : ${socket.id}`)
 
-    clients.push(socket)
+    var clientsCount = io.engine.clientsCount
 
-    console.log(clients.length)
+    console.log(clientsCount)
 
-    if(clients.length == 2){
-        console.log('Jogo Iniciado')
-        socket.broadcast.emit('startGame')
-    }
+    socket.emit('connection' , clientsCount)
+
+    socket.on('startGame' , function(pong){
+        console.log('Jogo Começou')
+        socket.emit('gameStarted' , pong)
+    })
+
+    socket.on('end' , () => {
+        socket.broadcast.emit('playerDisconnected' , clientsCount)
+        socket.disconnect(0)
+    })
+    
 })
+
+
+
+
+

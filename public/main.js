@@ -1,14 +1,31 @@
 var socket = io('http://localhost:3000')
 
-socket.on('startGame' , (socket) => {
-    console.log('Start Game')
-    // initGame()
+var pong
+
+// socket.on('startGame' , (data) => {
+//     console.log('Jogo Iniciado' + data)
+//     initGame()
+// })
+
+socket.on('connection' , function(clientsCount){
+    console.log('Quantidade de Jogadores: ' + clientsCount)
+
+    if(clientsCount == 2){
+        initGame()
+    }
 })
 
-window.onload = initGame
+socket.on('playerDisconnected' , function(player){
+    pong.win('Outro jogador se desconectou!')
+    // socket.emit('end')
+})
+
+window.onunload = function(){
+    socket.emit('end')
+}
 
 function initGame() {
-    var pong = new Pong(document.getElementById('pong'));
+    pong = new Pong(document.getElementById('pong'));
 
     function resize () {
         var gameHeight = window.innerHeight - 40 + 'px';
@@ -20,11 +37,10 @@ function initGame() {
     resize();
 
     pong.on('point', function (player) {
-        if(player.score == 2){
+        if(player.score == 10){
             var pName = (player === pong.players.a) ? '1' : '2';
             pong.win('Jogador ' + pName + ' venceu!');
         }
-        
     })
 
     window.onresize = resize;
@@ -38,4 +54,8 @@ function initGame() {
         'up': 'up',
         'down': 'down',
     });
+
+    function winGame(){
+        
+    }
 };
